@@ -1,36 +1,59 @@
 #include <Arduino.h>
 #include <Adafruit_VEML7700.h>
+#include <Adafruit_SSD1306.h>
+#include <Adafruit_GFX.h>
+#include <Wire.h>
+
+#include <constants.h>
+#include <computation.h>
 
 Adafruit_VEML7700 veml = Adafruit_VEML7700();
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
 
 void setup()
 {
-  // Start serial communication
   Serial.begin(115200);
   while (!Serial)
-    delay(10); // Wait for Serial Monitor to open
+    delay(10);
 
-  // Initialize I2C communication with VEML7700
   if (!veml.begin())
   {
-    Serial.println("Failed to initialize VEML7700 sensor!");
+    Serial.println("Failed to initialize VEML7700 sensor.");
     while (1)
-      ; // Stop if initialization fails
+      ;
   }
 
-  // Optional: Set gain and integration time (default is auto)
-  veml.setGain(VEML7700_GAIN_1);              // 1x gain
-  veml.setIntegrationTime(VEML7700_IT_800MS); // 800ms integration time
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C))
+  {
+    Serial.println("SSD1306 allocation failed.");
+    while (1)
+      ;
+  }
 
-  Serial.println("VEML7700 initialized successfully!");
+  // VEML7700 settings
+  veml.setGain(VEML7700_GAIN_1);
+  veml.setIntegrationTime(VEML7700_IT_25MS);
+  veml.setLowThreshold(10000);
+  veml.setHighThreshold(20000);
+  veml.interruptEnable(true);
+
+  // Clear the display buffer
+  display.clearDisplay();
+  display.display();
 }
 
 void loop()
 {
-  // Read lux value from VEML7700
-  float lux = veml.readLux();
-  Serial.print("Lux: ");
-  Serial.println(lux);
+  float reading = veml.readLux();
+  float ev = convert_reading_to_ev(reading);
 
-  delay(1000); // Read every second
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.print("EV: ");
+  display.println(ev);
+  display.display();
+
+  delay(500);
 }

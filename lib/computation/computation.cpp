@@ -14,6 +14,14 @@ float compensate_lux_reading(float reading)
 }
 
 /**
+ * Convert the lux reading to an exposure value
+ */
+float convert_reading_to_ev(float reading)
+{
+  return log2((compensate_lux_reading(reading) / 2.5));
+}
+
+/**
  * Based on the exposure value formula: EV = log2((N*N)/t)-log2(S/100)
  * where t is shutter speed and N is aperture.
  * We can calculate the shutter speed with: t = (N*N)/(2^EV*(S/100))

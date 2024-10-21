@@ -12,4 +12,7 @@ const float BASE_SHUTTER_SPEED = 1.0;
 
 const int ISO = 400;
 
+const int SCREEN_WIDTH = 120;
+const int SCREEN_HEIGHT = 32;
+
 #endif
