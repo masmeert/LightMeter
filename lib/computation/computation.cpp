@@ -1,7 +1,9 @@
 #include <cmath>
+#include <string>
+#include <sstream>
+#include <limits>
 
 #include <constants.h>
-#include <helpers.h>
 
 /**
  * The VEML7700 provides a LUX value between 0 and 1000
@@ -26,18 +28,49 @@ float convert_reading_to_ev(float reading)
  * where t is shutter speed and N is aperture.
  * We can calculate the shutter speed with: t = (N*N)/(2^EV*(S/100))
  */
-float calculate_shutter_speed(float aperture, float ev)
+std::string calculate_shutter_speed(float aperture, float ev)
 {
-  float raw_shutter_speed = (aperture * aperture) / (pow(2, ev) * (ISO / 100));
-  return find_closest(raw_shutter_speed, SHUTTER_SPEEDS, SHUTTER_SPEEDS_COUNT);
-}
+  // Calculate raw shutter speed in seconds using the formula
+  float raw_shutter_speed = (pow(aperture, 2) / pow(2, ev)) * 100 / ISO;
 
-/**
- * Using the same EV formula as above,
- * We can calculate the aperture with: N = sqrt(t*2^EV*(S/100))
- */
-float calculate_aperture(float shutter_speed, float ev)
-{
-  float raw_aperture = sqrt(shutter_speed * pow(2, ev) * (ISO / 100));
-  return find_closest(raw_aperture, APERTURES, APERTURES_COUNT);
+  std::ostringstream result;
+
+  if (raw_shutter_speed >= 1.0)
+  {
+    // Round to the nearest 0.0 or 0.5 for shutter speeds >= 1.0
+    float rounded_speed = std::round(raw_shutter_speed * 2.0) / 2.0;
+    result << rounded_speed << "s";
+  }
+  else
+  {
+    // Initialize the closest shutter speed and minimum difference
+    float closest = 0.0;
+    float min_diff = std::numeric_limits<float>::max(); // Start with the largest possible value
+
+    // Iterate through SHUTTER_SPEEDS to find the closest
+    for (const float &shutter_speed : SHUTTER_SPEEDS)
+    {
+      // Calculate the equivalent speed in seconds (1/shutter_speed)
+      float equivalent_speed = 1.0 / shutter_speed;
+
+      float diff = std::abs(raw_shutter_speed - equivalent_speed);
+      if (diff < min_diff)
+      {
+        min_diff = diff;
+        closest = shutter_speed;
+      }
+    }
+
+    // Check if closest was found and prevent division by zero
+    if (closest > 0)
+    {
+      result << "1/" << static_cast<int>(closest) << "s"; // Return "1/<X>s"
+    }
+    else
+    {
+      result << "Invalid shutter speed"; // Error handling
+    }
+  }
+
+  return result.str();
 }
