@@ -11,7 +11,8 @@
  */
 float compensate_lux_reading(float reading)
 {
-  return (6.0135e-13 * pow(reading, 4)) - (9.3924e-9 * pow(reading, 3)) + (8.1488e-5 * pow(reading, 2)) + (1.0023 * reading);
+  return (6.0135e-13f * std::pow(reading, 4)) - (9.3924e-9f * std::pow(reading, 3)) +
+         (8.1488e-5f * std::pow(reading, 2)) + (1.0023f * reading);
 }
 
 /**
@@ -19,7 +20,7 @@ float compensate_lux_reading(float reading)
  */
 float convert_reading_to_ev(float reading)
 {
-  return log2((compensate_lux_reading(reading) / 2.5));
+  return std::log2((compensate_lux_reading(reading) / 2.5f));
 }
 
 /**
@@ -29,7 +30,7 @@ float convert_reading_to_ev(float reading)
  */
 float calculate_shutter_speed(float aperture, float ev)
 {
-  return (pow(aperture, 2) / pow(2, ev)) * (FILM_ISO / 100);
+  return (std::pow(aperture, 2) / std::pow(2, ev)) * (FILM_ISO / 100.0f);
 }
 
 /**
@@ -38,7 +39,7 @@ float calculate_shutter_speed(float aperture, float ev)
  */
 float calculate_aperture(float shutter_speed, float ev)
 {
-  return sqrt(shutter_speed * pow(2, ev) * (FILM_ISO / 100));
+  return std::sqrt(shutter_speed * std::pow(2, ev) * (FILM_ISO / 100.0f));
 }
 
 /**
@@ -47,12 +48,6 @@ float calculate_aperture(float shutter_speed, float ev)
  */
 void compute_exposure_settings(bool aperture_priority, float EV, float &shutter_speed, float &aperture)
 {
-  if (aperture_priority)
-  {
-    shutter_speed = calculate_shutter_speed(aperture, EV);
-  }
-  else
-  {
-    aperture = calculate_aperture(shutter_speed, EV);
-  }
+  aperture_priority ? shutter_speed = calculate_shutter_speed(aperture, EV)
+                    : aperture = calculate_aperture(shutter_speed, EV);
 }
