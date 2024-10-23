@@ -24,4 +24,11 @@ constexpr uint8_t PRIORITY_BUTTON = 4;
 // Timing constants
 constexpr int DEBOUNCE_DELAY_MS = 250;
 
+// Default light meter settings
+constexpr ExposureMode DEFAULT_EXPOSURE_MODE = ExposureMode::AperturePriority;
+constexpr int DEFAULT_APERTURE_INDEX = 0;
+constexpr float DEFAULT_APERTURE = 2.8f;
+constexpr int DEFAULT_SHUTTER_SPEED_INDEX = 12;
+constexpr float DEFAULT_SHUTTER_SPEED = 0.001f;
+
 #endif // CONSTANTS_H

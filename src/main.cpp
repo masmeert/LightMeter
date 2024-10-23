@@ -22,12 +22,11 @@ void setup()
 
   // Initialize camera settings
   light_meter_settings = {
-      ExposureMode::AperturePriority, // aperture priority
-      0,                              // f/4
-      2.8f,                           // f/4
-      12,                             // 1/1000s
-      0.001f                          // 1/1000s
-  };
+      DEFAULT_EXPOSURE_MODE,
+      DEFAULT_APERTURE_INDEX,
+      DEFAULT_APERTURE,
+      DEFAULT_SHUTTER_SPEED_INDEX,
+      DEFAULT_SHUTTER_SPEED};
 }
 
 void loop()

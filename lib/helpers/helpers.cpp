@@ -4,6 +4,7 @@
 #include <constants.h>
 #include <computation.h>
 #include <types.h>
+
 bool is_button_pressed(int pin)
 {
     if (digitalRead(pin) == HIGH)
@@ -19,12 +20,12 @@ void reset_exposure_settings(LightMeterSettings &settings)
     switch (settings.mode)
     {
     case ExposureMode::AperturePriority:
-        settings.selected_aperture_index = 0;
-        settings.aperture = 2.8f;
+        settings.selected_aperture_index = DEFAULT_APERTURE_INDEX;
+        settings.aperture = DEFAULT_APERTURE;
         break;
     case ExposureMode::ShutterPriority:
-        settings.selected_shutter_speed_index = 12;
-        settings.shutter_speed = 0.001f;
+        settings.selected_shutter_speed_index = DEFAULT_SHUTTER_SPEED_INDEX;
+        settings.shutter_speed = DEFAULT_SHUTTER_SPEED;
         break;
     }
 }
