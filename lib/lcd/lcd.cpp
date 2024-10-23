@@ -2,7 +2,7 @@
 #include <math.h>
 
 #include <constants.h>
-#include <computation.h>
+#include <types.h>
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
 
@@ -25,7 +25,7 @@ void setup_display()
     display.display();
 }
 
-void display_values(float EV, float shutter_speed, float aperture)
+void display_values(LightMeterSettings &settings, float EV)
 {
     display.clearDisplay();
     display.setTextColor(TEXT_COLOR);
@@ -34,10 +34,10 @@ void display_values(float EV, float shutter_speed, float aperture)
     display.setTextSize(LARGE_TEXT_SIZE);
     display.setCursor(COLUMN_1_X, ROW_1_Y);
     display.print("f/");
-    display.print(aperture, 1);
+    display.print(settings.aperture, 1);
 
     display.setCursor(COLUMN_1_X, ROW_2_Y);
-    display.print(shutter_speed, 3);
+    display.print(settings.shutter_speed, 3);
     display.print("s");
 
     display.setTextSize(SMALL_TEXT_SIZE);

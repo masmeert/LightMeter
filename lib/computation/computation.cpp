@@ -1,6 +1,7 @@
 #include <cmath>
 
 #include <constants.h>
+#include <types.h>
 
 /**
  * The VEML7700 provides a LUX value between 0 and 1000
@@ -44,8 +45,8 @@ float calculate_aperture(float shutter_speed, float ev)
  * Compute the right exposure setting
  * base on the priority mode
  */
-void compute_exposure_settings(bool aperture_priority, float EV, float &shutter_speed, float &aperture)
+void compute_exposure_settings(LightMeterSettings &settings, float EV)
 {
-  aperture_priority ? shutter_speed = calculate_shutter_speed(aperture, EV)
-                    : aperture = calculate_aperture(shutter_speed, EV);
+  settings.mode == ExposureMode::AperturePriority ? settings.shutter_speed = calculate_shutter_speed(settings.aperture, EV)
+                                                  : settings.aperture = calculate_aperture(settings.shutter_speed, EV);
 }

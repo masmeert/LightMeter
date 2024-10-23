@@ -3,50 +3,52 @@
 
 #include <constants.h>
 #include <computation.h>
-
+#include <types.h>
 bool is_button_pressed(int pin)
 {
     if (digitalRead(pin) == HIGH)
     {
         delay(DEBOUNCE_DELAY_MS);
-        return digitalRead(pin) == HIGH; // Check again after debounce
+        return digitalRead(pin) == HIGH;
     }
     return false;
 }
 
-void reset_exposure_settings(bool aperture_priority, float &shutter_speed, float &aperture, int &selected_aperture_index, int &selected_shutter_speed_index)
+void reset_exposure_settings(LightMeterSettings &settings)
 {
-    if (aperture_priority)
+    switch (settings.mode)
     {
-        selected_aperture_index = 0;
-        aperture = 2.8f;
-    }
-    else
-    {
-        selected_shutter_speed_index = 12;
-        shutter_speed = 0.001f;
+    case ExposureMode::AperturePriority:
+        settings.selected_aperture_index = 0;
+        settings.aperture = 2.8f;
+        break;
+    case ExposureMode::ShutterPriority:
+        settings.selected_shutter_speed_index = 12;
+        settings.shutter_speed = 0.001f;
+        break;
     }
 }
 
-void handle_button_pressed(bool &aperture_priority, float EV, float &shutter_speed, float &aperture, int &selected_aperture_index, int &selected_shutter_speed_index)
+void handle_button_pressed(LightMeterSettings &settings, float EV)
 {
     if (is_button_pressed(PRIORITY_BUTTON))
     {
-        aperture_priority = !aperture_priority;
-        reset_exposure_settings(aperture_priority, shutter_speed, aperture, selected_aperture_index, selected_shutter_speed_index);
+        settings.mode = (settings.mode == ExposureMode::AperturePriority) ? ExposureMode::ShutterPriority : ExposureMode::AperturePriority;
+        reset_exposure_settings(settings);
     }
     else if (is_button_pressed(SETTINGS_BUTTON))
     {
-        if (aperture_priority)
+        switch (settings.mode)
         {
-            selected_aperture_index = (selected_aperture_index + 1) % APERTURES.size();
-            aperture = APERTURES[selected_aperture_index];
-        }
-        else
-        {
-            selected_shutter_speed_index = (selected_shutter_speed_index + 1) % SHUTTER_SPEEDS.size();
-            shutter_speed = SHUTTER_SPEEDS[selected_shutter_speed_index];
+        case ExposureMode::AperturePriority:
+            settings.selected_aperture_index = (settings.selected_aperture_index + 1) % APERTURES.size();
+            settings.aperture = APERTURES[settings.selected_aperture_index];
+            break;
+        case ExposureMode::ShutterPriority:
+            settings.selected_shutter_speed_index = (settings.selected_shutter_speed_index + 1) % SHUTTER_SPEEDS.size();
+            settings.shutter_speed = SHUTTER_SPEEDS[settings.selected_shutter_speed_index];
+            break;
         }
     }
-    compute_exposure_settings(aperture_priority, EV, shutter_speed, aperture);
+    compute_exposure_settings(settings, EV);
 }

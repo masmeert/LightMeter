@@ -5,6 +5,6 @@
 
 extern Adafruit_SSD1306 display;
 void setup_display();
-void display_values(float EV, float shutter_speed, float aperture);
+void display_values(LightMeterSettings &settings, float EV);
 
 #endif
