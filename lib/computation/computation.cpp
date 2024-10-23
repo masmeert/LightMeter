@@ -23,54 +23,66 @@ float convert_reading_to_ev(float reading)
   return log2((compensate_lux_reading(reading) / 2.5));
 }
 
-/**
- * Based on the exposure value formula: EV = log2((N*N)/t)-log2(S/100)
- * where t is shutter speed and N is aperture.
- * We can calculate the shutter speed with: t = (N*N)/(2^EV*(S/100))
- */
-std::string calculate_shutter_speed(float aperture, float ev)
+float unformat_shutter_speed(const std::string &shutter_speed_str)
 {
-  // Calculate raw shutter speed in seconds using the formula
-  float raw_shutter_speed = (pow(aperture, 2) / pow(2, ev)) * 100 / ISO;
-
-  std::ostringstream result;
-
-  if (raw_shutter_speed >= 1.0)
+  // Check if the string is in the form "1/Xs" (fractional shutter speed)
+  if (shutter_speed_str.find("1/") != std::string::npos)
   {
-    // Round to the nearest 0.0 or 0.5 for shutter speeds >= 1.0
-    float rounded_speed = std::round(raw_shutter_speed * 2.0) / 2.0;
-    result << rounded_speed << "s";
-  }
-  else
-  {
-    // Initialize the closest shutter speed and minimum difference
-    float closest = 0.0;
-    float min_diff = std::numeric_limits<float>::max(); // Start with the largest possible value
+    // Extract the denominator (X) from the string, which is after "1/"
+    std::size_t slash_pos = shutter_speed_str.find('/');
+    std::size_t s_pos = shutter_speed_str.find('s');
 
-    // Iterate through SHUTTER_SPEEDS to find the closest
-    for (const float &shutter_speed : SHUTTER_SPEEDS)
+    if (slash_pos != std::string::npos && s_pos != std::string::npos)
     {
-      // Calculate the equivalent speed in seconds (1/shutter_speed)
-      float equivalent_speed = 1.0 / shutter_speed;
+      // Extract the number after "1/"
+      std::string denominator_str = shutter_speed_str.substr(slash_pos + 1, s_pos - slash_pos - 1);
 
-      float diff = std::abs(raw_shutter_speed - equivalent_speed);
-      if (diff < min_diff)
+      // Check if denominator_str contains only digits
+      for (char c : denominator_str)
       {
-        min_diff = diff;
-        closest = shutter_speed;
+        if (!isdigit(c))
+        {
+          return -1.0f; // Return -1.0 if it's not a valid number
+        }
+      }
+
+      // Convert the denominator to an integer
+      int denominator = atoi(denominator_str.c_str());
+      if (denominator > 0)
+      {
+        return 1.0f / static_cast<float>(denominator);
+      }
+    }
+  }
+  // Check if the string is in the form "X.Xs" (whole or decimal shutter speed)
+  else if (shutter_speed_str.find("s") != std::string::npos)
+  {
+    // Extract the number before "s"
+    std::size_t s_pos = shutter_speed_str.find('s');
+    std::string speed_str = shutter_speed_str.substr(0, s_pos);
+
+    // Check if speed_str is a valid float
+    bool dot_found = false;
+    for (char c : speed_str)
+    {
+      if (c == '.')
+      {
+        if (dot_found)
+        {
+          return -1.0f; // Invalid if there are multiple dots
+        }
+        dot_found = true;
+      }
+      else if (!isdigit(c))
+      {
+        return -1.0f; // Return -1.0 if it's not a valid number
       }
     }
 
-    // Check if closest was found and prevent division by zero
-    if (closest > 0)
-    {
-      result << "1/" << static_cast<int>(closest) << "s"; // Return "1/<X>s"
-    }
-    else
-    {
-      result << "Invalid shutter speed"; // Error handling
-    }
+    // Convert the speed_str to a float
+    return atof(speed_str.c_str());
   }
 
-  return result.str();
+  // Return -1.0 if the input format is invalid
+  return -1.0f;
 }
