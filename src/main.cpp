@@ -30,7 +30,7 @@ void setup()
   // Set shutter speed to 1/1000s by default
   selected_shutter_speed_index = 12;
   // Set to aperture priority by default
-  aperture_priority = 1;
+  aperture_priority = true;
 }
 
 void loop()

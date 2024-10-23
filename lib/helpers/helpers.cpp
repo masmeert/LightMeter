@@ -22,8 +22,8 @@ void reset_exposure_settings(bool aperture_priority, float &shutter_speed, float
     }
     else
     {
-        selected_shutter_speed_index = 12;
-        shutter_speed = 0.001f;
+        selected_shutter_speed_index = 0;
+        shutter_speed = 4.0f;
     }
 }
 
