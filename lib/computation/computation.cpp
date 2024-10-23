@@ -32,30 +32,6 @@ float calculate_shutter_speed(float aperture, float ev)
   return (pow(aperture, 2) / pow(2, ev)) * (FILM_ISO / 100);
 }
 
-float find_closest_shutter_speed(float shutter_speed)
-{
-  if (shutter_speed >= 1.0f)
-  {
-    return shutter_speed;
-  }
-  else
-  {
-    float closest = FRACTIONAL_SHUTTER_SPEEDS[0];
-    float min_diff = std::abs(shutter_speed - closest);
-
-    for (const float speed : FRACTIONAL_SHUTTER_SPEEDS)
-    {
-      float diff = std::abs(shutter_speed - speed);
-      if (diff < min_diff)
-      {
-        min_diff = diff;
-        closest = speed;
-      }
-    }
-    return closest;
-  }
-}
-
 /**
  * Using the same EV formula as above,
  * We can calculate the aperture with : N = sqrt(t * 2 ^ EV * (S / 100)) float calculate_aperture(float shutter_speed, float ev)
@@ -63,25 +39,6 @@ float find_closest_shutter_speed(float shutter_speed)
 float calculate_aperture(float shutter_speed, float ev)
 {
   return sqrt(shutter_speed * pow(2, ev) * (FILM_ISO / 100));
-}
-
-float find_closest_aperture(float calculated_aperture)
-{
-  float closest_aperture = 0.0f;
-
-  for (int i = 0; i < sizeof(APERTURES) / sizeof(APERTURES[0]); ++i)
-  {
-    if (APERTURES[i] <= calculated_aperture)
-    {
-      closest_aperture = APERTURES[i];
-    }
-    else
-    {
-      break;
-    }
-  }
-
-  return closest_aperture;
 }
 
 /**
@@ -92,10 +49,10 @@ void compute_exposure_settings(bool aperture_priority, float EV, float &shutter_
 {
   if (aperture_priority)
   {
-    shutter_speed = find_closest_shutter_speed(calculate_shutter_speed(aperture, EV));
+    shutter_speed = calculate_shutter_speed(aperture, EV);
   }
   else
   {
-    aperture = find_closest_aperture(calculate_aperture(shutter_speed, EV));
+    aperture = calculate_aperture(shutter_speed, EV);
   }
 }
