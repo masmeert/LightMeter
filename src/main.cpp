@@ -11,21 +11,17 @@
 Adafruit_VEML7700 VEML = Adafruit_VEML7700();
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
 
-const int SETTINGS_BUTTON = 3;
-const int PRIORITY_BUTTON = 4;
-
 // Set aperture to 2.8 by default
 int selected_aperture_index = 0;
 // Set shutter speed to 1/1000s by default
 int selected_shutter_speed_index = 12;
-
 // 1 = Aperture priority, 0 = shutter priority
 bool priority_mode = 1;
+// Variables to contain computed values
+float shutter_speed;
+float aperture;
 
-float shutter_speed = 0.001f;
-float aperture = 2.8f;
-
-void initialize_veml()
+void setup_light_sensor()
 {
   if (!VEML.begin())
   {
@@ -39,11 +35,11 @@ void initialize_veml()
   VEML.interruptEnable(true);
 }
 
-void initialize_lcd()
+void setup_display()
 {
   if (display.begin(SSD1306_SWITCHCAPVCC, 0x3C))
   {
-    Serial.println("Failed to initialize VEML7700 sensor.");
+    Serial.println("Failed to initialize SSD1306 display.");
     return;
   }
   display.clearDisplay();
@@ -68,8 +64,8 @@ void setup()
 
   pinMode(SETTINGS_BUTTON, INPUT);
   pinMode(PRIORITY_BUTTON, INPUT);
-  initialize_veml();
-  initialize_lcd();
+  setup_light_sensor();
+  setup_display();
 }
 
 void loop()
@@ -87,15 +83,14 @@ void loop()
   // Change priority mode on input
   if (digitalRead(PRIORITY_BUTTON) == HIGH)
   {
-    delay(250);
+    delay(DEBOUNCE_DELAY_MS);
     priority_mode = !priority_mode;
   }
 
   // Change aperture on input
   if (digitalRead(SETTINGS_BUTTON) == HIGH)
   {
-    // Debounce delay
-    delay(250);
+    delay(DEBOUNCE_DELAY_MS);
     if (priority_mode)
     {
       selected_aperture_index++;
@@ -130,5 +125,5 @@ void loop()
   display.println(ev);
 
   display.display();
-  delay(250);
+  delay(DEBOUNCE_DELAY_MS);
 }
