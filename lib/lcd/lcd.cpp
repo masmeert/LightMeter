@@ -1,5 +1,4 @@
 #include <Adafruit_SSD1306.h>
-#include <math.h>
 
 #include <constants.h>
 #include <types.h>
@@ -34,10 +33,10 @@ void display_values(LightMeterSettings &settings, float EV)
     display.setTextSize(LARGE_TEXT_SIZE);
     display.setCursor(COLUMN_1_X, ROW_1_Y);
     display.print("f/");
-    display.print(settings.aperture, 1);
+    display.print(APERTURES[settings.selected_aperture_index], 1);
 
     display.setCursor(COLUMN_1_X, ROW_2_Y);
-    display.print(settings.shutter_speed, 3);
+    display.print(SHUTTER_SPEEDS[settings.selected_shutter_speed_index], 3);
     display.print("s");
 
     display.setTextSize(SMALL_TEXT_SIZE);

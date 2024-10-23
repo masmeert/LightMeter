@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <Adafruit_GFX.h>
 #include <Wire.h>
 
 #include <constants.h>
@@ -24,9 +23,8 @@ void setup()
   light_meter_settings = {
       DEFAULT_EXPOSURE_MODE,
       DEFAULT_APERTURE_INDEX,
-      DEFAULT_APERTURE,
       DEFAULT_SHUTTER_SPEED_INDEX,
-      DEFAULT_SHUTTER_SPEED};
+  };
 }
 
 void loop()

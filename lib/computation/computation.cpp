@@ -1,6 +1,7 @@
 #include <cmath>
 
 #include <constants.h>
+#include <helpers.h>
 #include <types.h>
 
 /**
@@ -47,6 +48,23 @@ float calculate_aperture(float shutter_speed, float ev)
  */
 void compute_exposure_settings(LightMeterSettings &settings, float EV)
 {
-  settings.mode == ExposureMode::AperturePriority ? settings.shutter_speed = calculate_shutter_speed(settings.aperture, EV)
-                                                  : settings.aperture = calculate_aperture(settings.shutter_speed, EV);
+  switch (settings.mode)
+  {
+  case ExposureMode::AperturePriority:
+  {
+    float shutter_speed = calculate_shutter_speed(APERTURES[settings.selected_aperture_index], EV);
+    settings.selected_shutter_speed_index = find_closest_index(SHUTTER_SPEEDS, shutter_speed, SHUTTER_SPEEDS_SIZE);
+    break;
+  }
+  case ExposureMode::ShutterPriority:
+  {
+    float aperture = calculate_aperture(SHUTTER_SPEEDS[settings.selected_shutter_speed_index], EV);
+    settings.selected_aperture_index = find_closest_index(APERTURES, aperture, APERTURES_SIZE);
+    break;
+  }
+  // Add a default case to handle all enum values
+  default:
+    // Handle unexpected mode or do nothing
+    break;
+  }
 }
