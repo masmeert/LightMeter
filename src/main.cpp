@@ -11,10 +11,16 @@
 Adafruit_VEML7700 VEML = Adafruit_VEML7700();
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
 
-const int SETTINGS_BUTTON = 4;
+const int SETTINGS_BUTTON = 3;
+const int PRIORITY_BUTTON = 4;
 
 // Set aperture to 2.8 by default
 int selected_aperture_index = 0;
+// 1 = Aperture priority, 0 = shutter priority
+bool priority_mode = 1;
+
+std::string shutter_speed = "1s";
+float aperture = 2.8;
 
 void initialize_veml()
 {
@@ -41,11 +47,20 @@ void initialize_lcd()
   display.display();
 }
 
+void compute_settings(float ev)
+{
+  if (priority_mode)
+  {
+    shutter_speed = calculate_shutter_speed(aperture, ev);
+  }
+}
+
 void setup()
 {
   Serial.begin(115200);
 
   pinMode(SETTINGS_BUTTON, INPUT);
+  pinMode(PRIORITY_BUTTON, INPUT);
   initialize_veml();
   initialize_lcd();
 }
@@ -55,25 +70,37 @@ void loop()
   // Read light
   float reading = VEML.readLux();
   float ev = convert_reading_to_ev(reading);
-
-  // Change prioritised setting on input
-  if (digitalRead(SETTINGS_BUTTON) == HIGH)
-  {
-    // Debounce delay
-    delay(250);
-    selected_aperture_index++;
-    if (selected_aperture_index >= static_cast<int>(sizeof(APERTURES) / sizeof(APERTURES[0])))
-      selected_aperture_index = 0; // Reset to the first aperture if on the last
-  }
+  compute_settings(ev);
 
   // Base display settings
   display.clearDisplay();
   display.setTextSize(2);
   display.setTextColor(SSD1306_WHITE);
 
-  // Camera settings display
-  float aperture = APERTURES[selected_aperture_index];
-  std::string shutter_speed = calculate_shutter_speed(aperture, ev);
+  // Change priority mode on input
+  if (digitalRead(PRIORITY_BUTTON) == HIGH)
+  {
+    delay(250);
+    priority_mode = !priority_mode;
+  }
+
+  // Change aperture on input
+  if (digitalRead(SETTINGS_BUTTON) == HIGH)
+  {
+    // Debounce delay
+    delay(250);
+    if (priority_mode)
+    {
+      selected_aperture_index++;
+      if (selected_aperture_index >= static_cast<int>(sizeof(APERTURES) / sizeof(APERTURES[0])))
+        selected_aperture_index = 0; // Reset to the first aperture if on the last
+
+      aperture = APERTURES[selected_aperture_index];
+    }
+    compute_settings(ev);
+  }
+
+  // display
   display.setCursor(0, 0);
   display.println(aperture);
   display.println(shutter_speed.c_str());
