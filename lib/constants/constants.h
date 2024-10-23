@@ -4,6 +4,8 @@
 #include <array>
 #include <cstdint>
 
+#include <types.h>
+
 // Camera settings
 constexpr int FILM_ISO = 800;
 
