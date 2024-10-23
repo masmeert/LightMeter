@@ -38,6 +38,7 @@ void loop()
   float EV = read_exposure_value();
 
   handle_button_pressed(aperture_priority, EV, shutter_speed, aperture, selected_aperture_index, selected_shutter_speed_index);
+  Serial.println(shutter_speed, 3);
   display_values(EV, shutter_speed, aperture);
   delay(DEBOUNCE_DELAY_MS);
 }
