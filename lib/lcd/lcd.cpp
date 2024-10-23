@@ -21,14 +21,16 @@ void display_values(float EV, float shutter_speed, float aperture)
     display.setTextColor(1);
 
     display.setCursor(0, 0);
+    display.print("f/");
     display.println(aperture);
-    display.println(shutter_speed, 4);
+    display.print(shutter_speed, 4);
+    display.print("s");
 
     display.setCursor(60, 0);
     display.print("ISO: ");
     display.println(ISO);
     display.setCursor(60, 8);
-    display.print("EV:");
+    display.print("EV: ");
     display.println(EV);
 
     display.display();
