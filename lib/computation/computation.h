@@ -1,5 +1,5 @@
-#ifndef COMPUTATION
-#define COMPUTATION
+#ifndef COMPUTATION_H
+#define COMPUTATION_H
 
 #include <string>
 

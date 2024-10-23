@@ -1,5 +1,5 @@
-#ifndef LCD
-#define LCD
+#ifndef LCD_H
+#define LCD_H
 
 #include <Adafruit_SSD1306.h>
 

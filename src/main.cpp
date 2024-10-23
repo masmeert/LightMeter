@@ -8,12 +8,9 @@
 #include <helpers.h>
 #include <lcd.h>
 #include <lightsensor.h>
+#include <types.h>
 
-int selected_aperture_index;
-int selected_shutter_speed_index;
-bool aperture_priority;
-float shutter_speed;
-float aperture;
+LightMeterSettings light_meter_settings;
 
 void setup()
 {
@@ -24,21 +21,26 @@ void setup()
   setup_light_sensor();
   setup_display();
 
-  // Set aperture to 2.8 by default
-  selected_aperture_index = 0;
-  aperture = 2.8f;
-  // Set shutter speed to 1/1000s by default
-  selected_shutter_speed_index = 12;
-  // Set to aperture priority by default
-  aperture_priority = true;
+  // Initialize camera settings
+  light_meter_settings = {
+      0,      // 4.0s
+      12,     // 1/1000s
+      true,   // aperture priority
+      0.001f, // 1/1000s
+      2.8f    // aperture
+  };
 }
 
 void loop()
 {
   float EV = read_exposure_value();
 
-  handle_button_pressed(aperture_priority, EV, shutter_speed, aperture, selected_aperture_index, selected_shutter_speed_index);
-  Serial.println(shutter_speed, 3);
-  display_values(EV, shutter_speed, aperture);
+  handle_button_pressed(light_meter_settings.aperture_priority, EV,
+                        light_meter_settings.shutter_speed, light_meter_settings.aperture,
+                        light_meter_settings.selected_aperture_index,
+                        light_meter_settings.selected_shutter_speed_index);
+
+  Serial.println(light_meter_settings.shutter_speed, 3);
+  display_values(EV, light_meter_settings.shutter_speed, light_meter_settings.aperture);
   delay(DEBOUNCE_DELAY_MS);
 }

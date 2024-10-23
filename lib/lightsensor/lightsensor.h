@@ -1,5 +1,5 @@
-#ifndef LIGHTSENSOR
-#define LIGHTSENSOR
+#ifndef LIGHTSENSOR_H
+#define LIGHTSENSOR_H
 
 #include <Adafruit_VEML7700.h>
 

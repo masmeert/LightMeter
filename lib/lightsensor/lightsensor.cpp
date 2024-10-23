@@ -11,7 +11,7 @@ void setup_light_sensor()
         Serial.println("Failed to init VEML7700.");
         return;
     }
-    VEML.setGain(VEML7700_GAIN_1);
+    VEML.setGain(VEML7700_GAIN_1_8);
     VEML.setIntegrationTime(VEML7700_IT_25MS);
     VEML.setLowThreshold(10000);
     VEML.setHighThreshold(20000);
