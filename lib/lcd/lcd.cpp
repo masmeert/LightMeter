@@ -1,6 +1,7 @@
 #include <Adafruit_SSD1306.h>
 
 #include <constants.h>
+#include <computation.h>
 #include <types.h>
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
@@ -36,7 +37,17 @@ void display_values(LightMeterSettings &settings, float EV)
     display.print(APERTURES[settings.selected_aperture_index], 1);
 
     display.setCursor(COLUMN_1_X, ROW_2_Y);
-    display.print(SHUTTER_SPEEDS[settings.selected_shutter_speed_index], 3);
+    float shutter_speed = SHUTTER_SPEEDS[settings.selected_shutter_speed_index];
+    float sanitized_shutter_speed = sanitize_shutter_speed(SHUTTER_SPEEDS[settings.selected_shutter_speed_index]);
+    if (shutter_speed < 1.0f)
+    {
+        display.print("1/");
+        display.print(static_cast<int>(sanitized_shutter_speed));
+    }
+    else
+    {
+        display.print(sanitized_shutter_speed);
+    }
     display.print("s");
 
     display.setTextSize(SMALL_TEXT_SIZE);

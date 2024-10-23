@@ -43,6 +43,23 @@ float calculate_aperture(float shutter_speed, float ev)
 }
 
 /**
+ * Convert shutter speed from seconds to fraction of a second
+ * if >= 1, else return a rounded value
+ */
+float sanitize_shutter_speed(float shutter_speed)
+{
+  if (shutter_speed < 0)
+    return -1.0f;
+
+  if (shutter_speed >= 1.0f)
+    return round(shutter_speed * 2.0f) / 2.0f;
+
+  float denominator = 1.0f / shutter_speed;
+  size_t closest_index = find_closest_index(SHUTTER_SPEEDS_DENOMINATORS, denominator, SHUTTER_SPEEDS_DENOMINATORS_SIZE);
+  return SHUTTER_SPEEDS_DENOMINATORS[closest_index];
+}
+
+/**
  * Compute the right exposure setting
  * base on the priority mode
  */
