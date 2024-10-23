@@ -29,16 +29,28 @@ void display_values(LightMeterSettings &settings, float EV)
 {
     display.clearDisplay();
     display.setTextColor(TEXT_COLOR);
+    display.setTextSize(SMALL_TEXT_SIZE);
 
     // Display aperture and shutter speed
-    display.setTextSize(LARGE_TEXT_SIZE);
+
     display.setCursor(COLUMN_1_X, ROW_1_Y);
-    display.print("f/");
+    if (settings.mode == ExposureMode::AperturePriority)
+    {
+        display.print(".f/");
+    }
+    else
+    {
+        display.print("f/");
+    }
     display.print(APERTURES[settings.selected_aperture_index], 1);
 
     display.setCursor(COLUMN_1_X, ROW_2_Y);
     float shutter_speed = SHUTTER_SPEEDS[settings.selected_shutter_speed_index];
-    float sanitized_shutter_speed = sanitize_shutter_speed(SHUTTER_SPEEDS[settings.selected_shutter_speed_index]);
+    float sanitized_shutter_speed = sanitize_shutter_speed(shutter_speed);
+    if (settings.mode == ExposureMode::ShutterPriority)
+    {
+        display.print(".");
+    }
     if (shutter_speed < 1.0f)
     {
         display.print("1/");
@@ -50,12 +62,14 @@ void display_values(LightMeterSettings &settings, float EV)
     }
     display.print("s");
 
-    display.setTextSize(SMALL_TEXT_SIZE);
     display.setCursor(COLUMN_2_X, ROW_1_Y);
     display.print("ISO:");
-    display.println(FILM_ISO);
+    display.println(ISO);
     display.setCursor(COLUMN_2_X, ROW_1_Y + 8);
     display.print("EV:");
     display.println(EV, 1);
+    display.setCursor(COLUMN_2_X, ROW_1_Y + 16);
+    display.print("CEV:");
+    display.println(convert_settings_to_ev(settings), 1);
     display.display();
 }

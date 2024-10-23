@@ -24,13 +24,23 @@ float convert_reading_to_ev(float reading)
 }
 
 /**
+ * Convert settings to EV
+ */
+float convert_settings_to_ev(LightMeterSettings &settings)
+{
+  float aperture = APERTURES[settings.selected_aperture_index];
+  float shutter_speed = SHUTTER_SPEEDS[settings.selected_shutter_speed_index];
+  return std::log2((aperture * aperture) / shutter_speed) - std::log2(ISO / 100.0f);
+}
+
+/**
  * Based on the exposure value formula: EV = log2((N*N)/t)-log2(S/100)
  * where t is shutter speed and N is aperture.
  * We can calculate the shutter speed with: t = (NN)/(2^EV(S/100))
  */
 float calculate_shutter_speed(float aperture, float ev)
 {
-  return (std::pow(aperture, 2) / std::pow(2, ev)) * (FILM_ISO / 100.0f);
+  return (std::pow(aperture, 2) / std::pow(2, ev)) * (ISO / 100.0f);
 }
 
 /**
@@ -39,7 +49,7 @@ float calculate_shutter_speed(float aperture, float ev)
  */
 float calculate_aperture(float shutter_speed, float ev)
 {
-  return std::sqrt(shutter_speed * std::pow(2, ev) * (FILM_ISO / 100.0f));
+  return std::sqrt(shutter_speed * std::pow(2, ev) * (ISO / 100.0f));
 }
 
 /**

@@ -6,7 +6,7 @@
 #include <types.h>
 
 // Camera settings
-constexpr int FILM_ISO = 800;
+constexpr int ISO = 800;
 
 // Display settings
 constexpr int SCREEN_WIDTH = 120;
@@ -58,7 +58,7 @@ constexpr uint8_t SETTINGS_BUTTON = 3;
 constexpr uint8_t PRIORITY_BUTTON = 4;
 
 // Timing constants
-constexpr int DEBOUNCE_DELAY_MS = 250;
+constexpr int DEBOUNCE_DELAY_MS = 100;
 
 // Default light meter settings
 constexpr ExposureMode DEFAULT_EXPOSURE_MODE = ExposureMode::AperturePriority;
