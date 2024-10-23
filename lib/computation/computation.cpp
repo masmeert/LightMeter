@@ -1,7 +1,4 @@
 #include <cmath>
-#include <string>
-#include <sstream>
-#include <limits>
 
 #include <constants.h>
 
@@ -23,66 +20,22 @@ float convert_reading_to_ev(float reading)
   return log2((compensate_lux_reading(reading) / 2.5));
 }
 
-float unformat_shutter_speed(const std::string &shutter_speed_str)
+/**
+ * Based on the exposure value formula: EV = log2((N*N)/t)-log2(S/100)
+ * where t is shutter speed and N is aperture.
+ * We can calculate the shutter speed with: t = (N*N)/(2^EV*(S/100))
+ */
+float calculate_shutter_speed(float aperture, float ev)
 {
-  // Check if the string is in the form "1/Xs" (fractional shutter speed)
-  if (shutter_speed_str.find("1/") != std::string::npos)
-  {
-    // Extract the denominator (X) from the string, which is after "1/"
-    std::size_t slash_pos = shutter_speed_str.find('/');
-    std::size_t s_pos = shutter_speed_str.find('s');
+  // Calculate raw shutter speed in seconds using the formula
+  return (pow(aperture, 2) / pow(2, ev)) * 100 / ISO;
+}
 
-    if (slash_pos != std::string::npos && s_pos != std::string::npos)
-    {
-      // Extract the number after "1/"
-      std::string denominator_str = shutter_speed_str.substr(slash_pos + 1, s_pos - slash_pos - 1);
-
-      // Check if denominator_str contains only digits
-      for (char c : denominator_str)
-      {
-        if (!isdigit(c))
-        {
-          return -1.0f; // Return -1.0 if it's not a valid number
-        }
-      }
-
-      // Convert the denominator to an integer
-      int denominator = atoi(denominator_str.c_str());
-      if (denominator > 0)
-      {
-        return 1.0f / static_cast<float>(denominator);
-      }
-    }
-  }
-  // Check if the string is in the form "X.Xs" (whole or decimal shutter speed)
-  else if (shutter_speed_str.find("s") != std::string::npos)
-  {
-    // Extract the number before "s"
-    std::size_t s_pos = shutter_speed_str.find('s');
-    std::string speed_str = shutter_speed_str.substr(0, s_pos);
-
-    // Check if speed_str is a valid float
-    bool dot_found = false;
-    for (char c : speed_str)
-    {
-      if (c == '.')
-      {
-        if (dot_found)
-        {
-          return -1.0f; // Invalid if there are multiple dots
-        }
-        dot_found = true;
-      }
-      else if (!isdigit(c))
-      {
-        return -1.0f; // Return -1.0 if it's not a valid number
-      }
-    }
-
-    // Convert the speed_str to a float
-    return atof(speed_str.c_str());
-  }
-
-  // Return -1.0 if the input format is invalid
-  return -1.0f;
+/**
+ * Using the same EV formula as above,
+ * We can calculate the aperture with : N = sqrt(t * 2 ^ EV * (S / 100)) float calculate_aperture(float shutter_speed, float ev)
+ */
+float calculate_aperture(float shutter_speed, float ev)
+{
+  return sqrt(shutter_speed * pow(2, ev) * ISO);
 }

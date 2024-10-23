@@ -5,7 +5,7 @@ const int ISO = 800;
 const int SCREEN_WIDTH = 120;
 const int SCREEN_HEIGHT = 32;
 
-const float APERTURES[] = {2.8, 4.0, 5.6, 8, 11, 16, 22};
-const float SHUTTER_SPEEDS[] = {2.0, 4.0, 8.0, 15.0, 30.0, 60.0, 125.0, 250.0, 500.0, 1000.0};
+const float APERTURES[] = {2.8f, 4.0f, 5.6f, 8.0f, 11.0f, 16.0f, 22.0f};
+const float SHUTTER_SPEEDS[] = {4.0f, 2.0f, 1.0f, 0.5f, 0.25f, 0.125f, 0.06666667f, 0.03333333f, 0.01666667f, 0.008f, 0.004f, 0.002f, 0.001f};
 
 #endif
