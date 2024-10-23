@@ -39,3 +39,15 @@ float calculate_aperture(float shutter_speed, float ev)
 {
   return sqrt(shutter_speed * pow(2, ev) * ISO);
 }
+
+void compute_exposure_settings(bool aperture_priority, float EV, float &shutter_speed, float &aperture)
+{
+  if (aperture_priority)
+  {
+    shutter_speed = calculate_shutter_speed(aperture, EV);
+  }
+  else
+  {
+    aperture = calculate_aperture(shutter_speed, EV);
+  }
+}
