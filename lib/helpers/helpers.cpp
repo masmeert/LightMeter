@@ -27,11 +27,11 @@ void reset_exposure_settings(bool aperture_priority, float &shutter_speed, float
     }
 }
 
-void handle_button_pressed(bool aperture_priority, float EV, float &shutter_speed, float &aperture, int &selected_aperture_index, int &selected_shutter_speed_index)
+void handle_button_pressed(bool &aperture_priority, float EV, float &shutter_speed, float &aperture, int &selected_aperture_index, int &selected_shutter_speed_index)
 {
     if (is_button_pressed(PRIORITY_BUTTON))
     {
-        aperture_priority = !aperture_priority; // This won't affect the original due to pass by value
+        aperture_priority = !aperture_priority;
         reset_exposure_settings(aperture_priority, shutter_speed, aperture, selected_aperture_index, selected_shutter_speed_index);
     }
 
