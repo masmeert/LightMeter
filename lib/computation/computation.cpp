@@ -40,6 +40,29 @@ float calculate_aperture(float shutter_speed, float ev)
   return sqrt(shutter_speed * pow(2, ev) * ISO);
 }
 
+float find_closest_aperture(float calculated_aperture)
+{
+  float closest_aperture = 0.0f;
+
+  for (int i = 0; i < sizeof(APERTURES) / sizeof(APERTURES[0]); ++i)
+  {
+    if (APERTURES[i] <= calculated_aperture)
+    {
+      closest_aperture = APERTURES[i];
+    }
+    else
+    {
+      break;
+    }
+  }
+
+  return closest_aperture;
+}
+
+/**
+ * Compute the right exposure setting
+ * base on the priority mode
+ */
 void compute_exposure_settings(bool aperture_priority, float EV, float &shutter_speed, float &aperture)
 {
   if (aperture_priority)

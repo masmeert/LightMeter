@@ -1,5 +1,7 @@
-#include <constants.h>
 #include <Adafruit_SSD1306.h>
+
+#include <constants.h>
+#include <computation.h>
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
 
@@ -22,7 +24,7 @@ void display_values(float EV, float shutter_speed, float aperture)
 
     display.setCursor(0, 0);
     display.print("f/");
-    display.println(aperture);
+    display.println(find_closest_aperture(aperture));
     display.print(shutter_speed, 4);
     display.print("s");
 
