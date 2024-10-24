@@ -44,15 +44,11 @@ void handle_button_pressed(LightMeterSettings &settings, float EV)
         switch (settings.mode)
         {
         case ExposureMode::AperturePriority:
-        {
             settings.selected_aperture_index = (settings.selected_aperture_index + 1) % (sizeof(APERTURES) / sizeof(APERTURES[0]));
             break;
-        }
         case ExposureMode::ShutterPriority:
-        {
             settings.selected_shutter_speed_index = (settings.selected_shutter_speed_index + 1) % (sizeof(SHUTTER_SPEEDS) / sizeof(SHUTTER_SPEEDS[0]));
             break;
-        }
         }
     }
     compute_exposure_settings(settings, EV);
