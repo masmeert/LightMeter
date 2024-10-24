@@ -1,97 +1,56 @@
 #include <cmath>
-
-#include <constants.h>
-#include <helpers.h>
-#include <types.h>
+#include <cstdint>
 
 /**
- * The VEML7700 provides a LUX value between 0 and 1000
- * once 1000lx is exceeded the sensor's response starts to deviate from a direct linear scale.
- * To correct for this behavior, the manufacturer provides the following formula.
+ * @brief Computes the shutter speed from the exposure value and the aperture
+ *
+ * As the EV formula is EV = 2log2(N) - log2(t)
+ * Where N is the aperture and t is the shutter speed
+ * We can solve for t: t = N^2 / 2^EV
  */
-float compensate_lux_reading(float reading)
+float computeShutterSpeed(float EV, float N)
 {
-  return (6.0135e-13f * std::pow(reading, 4)) - (9.3924e-9f * std::pow(reading, 3)) +
-         (8.1488e-5f * std::pow(reading, 2)) + (1.0023f * reading);
+  return (N * N) / std::exp2f(EV);
 }
 
 /**
- * Convert the lux reading to an exposure value
+ * @brief Computes the aperture from the exposure value and the shutter speed
+ *
+ * As the EV formula is EV = 2log2(N) - log2(t)
+ * We can solve for N: N = 2^((EV + log2(t))/2)
  */
-float convert_reading_to_ev(float reading)
+float computeAperture(float EV, float t)
 {
-  return std::log2((compensate_lux_reading(reading) / 2.5f));
+  return std::exp2f((EV + std::log2f(t)) / 2.0f);
 }
 
 /**
- * Convert settings to EV
+ * @brief Computes the exposure value from the aperture and the shutter speed
+ *
+ * EV = 2log2(N) - log2(t)
  */
-float convert_settings_to_ev(LightMeterSettings &settings)
+float reverseComputeEV(float aperture, float shutterSpeed)
 {
-  float aperture = APERTURES[settings.selected_aperture_index];
-  float shutter_speed = SHUTTER_SPEEDS[settings.selected_shutter_speed_index];
-  return std::log2((aperture * aperture) / shutter_speed) - std::log2(ISO / 100.0f);
+  return 2 * std::log2f(aperture) - std::log2f(shutterSpeed);
 }
 
 /**
- * Based on the exposure value formula: EV = log2((N*N)/t)-log2(S/100)
- * where t is shutter speed and N is aperture.
- * We can calculate the shutter speed with: t = (NN)/(2^EV(S/100))
+ * @brief Finds the index of the nearest float value in an array of floats
  */
-float calculate_shutter_speed(float aperture, float ev)
+uint8_t findNearestIndex(float value, const float *array, uint8_t size)
 {
-  return (std::pow(aperture, 2) / std::pow(2, ev)) * (ISO / 100.0f);
-}
-
-/**
- * Using the same EV formula as above,
- * We can calculate the aperture with : N = sqrt(t * 2 ^ EV * (S / 100)) float calculate_aperture(float shutter_speed, float ev)
- */
-float calculate_aperture(float shutter_speed, float ev)
-{
-  return std::sqrt(shutter_speed * std::pow(2, ev) * (ISO / 100.0f));
-}
-
-/**
- * Convert shutter speed from seconds to fraction of a second
- * if >= 1, else return a rounded value
- */
-float sanitize_shutter_speed(float shutter_speed)
-{
-  if (shutter_speed < 0)
-    return -1.0f;
-
-  if (shutter_speed >= 1.0f)
-    return round(shutter_speed * 2.0f) / 2.0f;
-
-  float denominator = 1.0f / shutter_speed;
-  size_t closest_index = find_closest_index(SHUTTER_SPEEDS_DENOMINATORS, denominator, SHUTTER_SPEEDS_DENOMINATORS_SIZE);
-  return SHUTTER_SPEEDS_DENOMINATORS[closest_index];
-}
-
-/**
- * Compute the right exposure setting
- * base on the priority mode
- */
-void compute_exposure_settings(LightMeterSettings &settings, float EV)
-{
-  switch (settings.mode)
+  uint8_t nearestIndex = 0;
+  float nearestDistance = std::abs(value - array[0]);
+  for (uint8_t i = 1; i < size; ++i)
   {
-  case ExposureMode::AperturePriority:
-  {
-    float shutter_speed = calculate_shutter_speed(APERTURES[settings.selected_aperture_index], EV);
-    settings.selected_shutter_speed_index = find_closest_index(SHUTTER_SPEEDS, shutter_speed, SHUTTER_SPEEDS_SIZE);
-    break;
+    float distance = std::abs(value - array[i]);
+    if (distance < nearestDistance)
+    {
+      nearestIndex = i;
+      nearestDistance = distance;
+      if (distance == 0.0f)
+        break;
+    }
   }
-  case ExposureMode::ShutterPriority:
-  {
-    float aperture = calculate_aperture(SHUTTER_SPEEDS[settings.selected_shutter_speed_index], EV);
-    settings.selected_aperture_index = find_closest_index(APERTURES, aperture, APERTURES_SIZE);
-    break;
-  }
-  // Add a default case to handle all enum values
-  default:
-    // Handle unexpected mode or do nothing
-    break;
-  }
+  return nearestIndex;
 }

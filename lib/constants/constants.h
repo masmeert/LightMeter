@@ -1,68 +1,42 @@
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef CONSTANTS_H_
+#define CONSTANTS_H_
 
 #include <cstdint>
 
-#include <types.h>
-
-// Camera settings
-constexpr int ISO = 800;
+// Screen settings
+const uint8_t SCREEN_WIDTH = 128; // px
+const uint8_t SCREEN_HEIGHT = 32; // px
+const uint8_t SCREEN_ADDRESS = 0x3C;
 
 // Display settings
-constexpr int SCREEN_WIDTH = 120;
-constexpr int SCREEN_HEIGHT = 32;
+const uint8_t TEXT_COLOR = 1;      // 0 = black, 1 = white
+const uint8_t LARGE_TEXT_SIZE = 2; // px
+const uint8_t SMALL_TEXT_SIZE = 1; // px
 
-// Aperture and shutter speed settings
-constexpr float APERTURES[] = {
-    2.8f,
-    4.0f,
-    5.6f,
-    8.0f,
-    11.0f,
-    16.0f,
-    22.0f,
+// Button settings
+const uint8_t INCREMENT_BUTTON_PIN = 3;
+const uint8_t MODE_BUTTON_PIN = 4;
+
+// Debounce settings
+const unsigned long DEBOUNCE_DELAY_MS = 100; // ms
+
+// Lightmeter settings
+enum ExposureMode : uint8_t
+{
+    AperturePriority,
+    ShutterPriority
 };
-constexpr float SHUTTER_SPEEDS[] = {
-    4.0f,
-    2.0f,
-    1.0f,
-    0.5f,
-    0.25f,
-    0.125f,
-    0.06666667f,
-    0.03333333f,
-    0.01666667f,
-    0.008f,
-    0.004f,
-    0.002f,
-    0.001f,
-};
-constexpr float SHUTTER_SPEEDS_DENOMINATORS[] = {
-    2,
-    4,
-    8,
-    15,
-    30,
-    60,
-    125,
-    250,
-    500,
-    1000,
-};
-constexpr size_t SHUTTER_SPEEDS_SIZE = 13;
-constexpr size_t APERTURES_SIZE = 7;
-constexpr size_t SHUTTER_SPEEDS_DENOMINATORS_SIZE = 10;
+const uint16_t ISO = 800;
+const uint8_t DEFAULT_APERTURE_INDEX = 17;      // f/8
+const uint8_t DEFAULT_SHUTTER_SPEED_INDEX = 15; // 1.0s
+const ExposureMode DEFAULT_EXPOSURE_MODE = ExposureMode::AperturePriority;
 
-// Button pin assignments
-constexpr uint8_t SETTINGS_BUTTON = 3;
-constexpr uint8_t PRIORITY_BUTTON = 4;
+// Aperture and shutter speed values + their display strings to avoid computation
+const uint8_t APERTURE_COUNT = 36;
+const uint8_t SHUTTER_SPEED_COUNT = 52;
+extern const float APERTURES[APERTURE_COUNT];
+extern const char *DISPLAY_APERTURES[APERTURE_COUNT];
+extern const float SHUTTER_SPEEDS[SHUTTER_SPEED_COUNT];
+extern const char *DISPLAY_SHUTTER_SPEEDS[SHUTTER_SPEED_COUNT];
 
-// Timing constants
-constexpr int DEBOUNCE_DELAY_MS = 100;
-
-// Default light meter settings
-constexpr ExposureMode DEFAULT_EXPOSURE_MODE = ExposureMode::ShutterPriority;
-constexpr int DEFAULT_APERTURE_INDEX = 0;
-constexpr int DEFAULT_SHUTTER_SPEED_INDEX = 12;
-
-#endif // CONSTANTS_H
+#endif // CONSTANTS_H_
